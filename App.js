@@ -12,7 +12,7 @@ import {
   Image,
   ScrollView
 } from 'react-native';
-import TrackPlayer, { Event, useTrackPlayerEvents, State, usePlaybackState } from 'react-native-track-player';
+import TrackPlayer, { Event, useTrackPlayerEvents, State, usePlaybackState, useProgress } from 'react-native-track-player';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { check, PERMISSIONS, request, RESULTS, requestMultiple } from 'react-native-permissions';
 import { setupPlayer, addTracks } from './trackPlayerServices';
@@ -39,8 +39,13 @@ function Playlist() {
   });
 
   function PlaylistItem({ index, title, isCurrent }) {
-    function handleItemPress() {
+    async function handleItemPress() {
       TrackPlayer.skip(index);
+      if (await TrackPlayer.getState() == State.Playing) {
+        TrackPlayer.pause();
+      } else {
+        TrackPlayer.play();
+      }
     }
 
     return (
@@ -78,12 +83,24 @@ function Playlist() {
 function Controls({ onShuffle }) {
   const playerState = usePlaybackState();
 
+  let ButtonIconString = false;
+
+  TrackPlayer.getState().then(data => {
+    if (data == 'playing') {
+      ButtonIconString = true;
+    } else if (data == 'paused') {
+      ButtonIconString = false;
+    }
+  })
+
   async function handlePlayerPress() {
     if (await TrackPlayer.getState() == State.Playing) {
       TrackPlayer.pause();
     } else {
       TrackPlayer.play();
     }
+    const info = await TrackPlayer.getTrack(await TrackPlayer.getCurrentTrack());
+    console.log(Object.keys(info));
   }
 
   return (
@@ -94,13 +111,13 @@ function Controls({ onShuffle }) {
         backgroundColor="transparent"
         onPress={() => TrackPlayer.skipToPrevious()}
       />
-      <Icon.Button 
-        name={playerState == State.Playing ? 'pause' : 'play'}
+      <Icon.Button
+        name={ButtonIconString ? 'pause' : 'play'}
         size={28}
         backgroundColor="transparent"
         onPress={handlePlayerPress}
       />
-      <Icon.Button 
+      <Icon.Button
         name="arrow-right"
         size={28}
         backgroundColor="transparent"
@@ -109,6 +126,48 @@ function Controls({ onShuffle }) {
     </View>
   )
 
+}
+
+function TrackProgress() {
+  const { position, duration } = useProgress(200);
+
+  function format(seconds) {
+    let mins = (parseInt(seconds / 60)).toString().padStart(2, '0');
+    let secs = (Math.trunc(seconds) % 60).toString().padStart(2, '0');
+    return `${mins}:${secs}`;
+  }
+
+  return (
+    <View>
+      <Text style={styles.trackProgress}>
+        {format(position)} / {format(duration)}
+      </Text>
+    </View>
+  );
+}
+
+function Header() {
+  const [info, setInfo] = useState({});
+  useEffect(() => {
+    setTrackInfo();
+  }, []);
+  useTrackPlayerEvents([Event.PlaybackTrackChanged], (event) => {
+    if (event.state == State.nextTrack) {
+      setTrackInfo();
+    }
+  });
+  async function setTrackInfo() {
+    const track = await TrackPlayer.getCurrentTrack();
+    const info = await TrackPlayer.getTrack(track);
+    setInfo(info);
+  }
+  return (
+    <View>
+      <Image src={{uri: require("./assets/audio.jpg")}}/>
+      <Text style={styles.songTitle}>{info.title}</Text>
+      <Text style={styles.artistName}>{info.artist}</Text>
+    </View>
+  );
 }
 
 function App() {
@@ -140,6 +199,8 @@ function App() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Header />
+      <TrackProgress />
       <Playlist />
     </SafeAreaView>
   );
@@ -149,7 +210,8 @@ function App() {
 const styles = StyleSheet.create({
   playlist: {
     marginTop: 40,
-    marginBottom: 40
+    marginBottom: 40,
+    height: 110,
   },
   playlistItem: {
     fontSize: 20,
@@ -165,6 +227,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
     backgroundColor: '#112'
+  },
+  trackProgress: {
+    marginTop: 40,
+    textAlign: 'center',
+    fontSize: 24,
+    color: '#eee'
+  },
+  songTitle: {
+    fontSize: 32,
+    marginTop: 50,
+    color: '#ccc'
+  },
+  artistName: {
+    fontSize: 24,
+    color: '#888'
   },
 });
 

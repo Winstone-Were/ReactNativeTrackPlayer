@@ -45,7 +45,7 @@ async function loadSongstoArray() {
     if (permissions) {
         try {
             const songResults = await getAll({
-                limit: 3,
+                limit: 40,
                 coverQuality: 50,
                 minSongDuration: 1000,
                 sortOrder: SortSongOrder.DESC,
@@ -104,7 +104,8 @@ export async function addTracks() {
                 url: Songs[i].url,
                 title: Songs[i].title,
                 artist: Songs[i].artist,
-                duration: Songs[i].duration
+                duration: Songs[i].duration,
+                cover: Songs[i].cover
             }
         )
     }
