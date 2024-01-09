@@ -12,7 +12,10 @@
   "dependencies": {
     "react": "18.2.0",
     "react-native": "0.73.2",
-    "react-native-track-player": "^4.0.1"
+    "react-native-get-music-files": "^2.2.4",
+    "react-native-permissions": "^4.0.4",
+    "react-native-track-player": "^4.0.1",
+    "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

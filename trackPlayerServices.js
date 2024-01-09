@@ -1,20 +1,75 @@
-import TrackPlayer,{
+import TrackPlayer, {
     AppKilledPlaybackBehavior,
     Capability,
     RepeatMode,
-    Event 
+    Event
 } from 'react-native-track-player';
+
+import { check, PERMISSIONS, request, RESULTS, requestMultiple } from 'react-native-permissions';
+import { getAll, getAlbums, searchSongs, SortSongFields, SortSongOrder } from "react-native-get-music-files";
+
+const hasPermissions = async () => {
+    if (Platform.OS === 'android') {
+        let hasPermission =
+            (await check(PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE)) ===
+            RESULTS.GRANTED || (await check(PERMISSIONS.ANDROID.READ_MEDIA_AUDIO)) ===
+            RESULTS.GRANTED;
+
+        if (!hasPermission) {
+            hasPermission = await requestMultiple([
+                PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+                PERMISSIONS.ANDROID.READ_MEDIA_AUDIO,
+            ]);
+        }
+
+        return hasPermission;
+    }
+
+    if (Platform.OS === 'ios') {
+        let hasPermission =
+            (await check(PERMISSIONS.IOS.MEDIA_LIBRARY)) === RESULTS.GRANTED;
+        if (!hasPermission) {
+            hasPermission =
+                (await request(PERMISSIONS.IOS.MEDIA_LIBRARY)) === RESULTS.GRANTED;
+        }
+
+        return hasPermission;
+    }
+
+    return false;
+};
+
+async function loadSongstoArray() {
+    const permissions = await hasPermissions();
+    let SongsArray = [];
+    if (permissions) {
+        try {
+            const songResults = await getAll({
+                limit: 3,
+                coverQuality: 50,
+                minSongDuration: 1000,
+                sortOrder: SortSongOrder.DESC,
+                sortBy: SortSongFields.TITLE,
+            });
+            SongsArray = songResults;
+        }catch(err) {
+            console.log(err);
+        }
+
+    }
+    return SongsArray;
+}
 
 export async function setupPlayer() {
     let isSetup = false;
     try {
         await TrackPlayer.getCurrentTrack();
         isSetup = true;
-    }  catch {
+    } catch {
         await TrackPlayer.setupPlayer();
         await TrackPlayer.updateOptions({
             android: {
-                appKilledPlaybackBehavior: 
+                appKilledPlaybackBehavior:
                     AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
             },
             capabilities: [
@@ -39,32 +94,25 @@ export async function setupPlayer() {
 }
 
 export async function addTracks() {
-    await TrackPlayer.add([
-        {
-            id:'1',
-            url: require('./assets/Counter.mp3'),
-            title: 'Counter',
-            artist: 'Stonie',
-            duration: 60
-        },
-        {
-            id:'2',
-            url: require('./assets/Cyan.mp3'),
-            title:'Cyan',
-            artist:'Stonie',
-            duration: 60
-        },
-        {
-            id:'3',
-            url: require('./assets/Was Kalopsia.mp3'),
-            title:'Was Kalopsia',
-            artist:'Stonie',
-            duration:60
-        }
-    ]);
+    let Songs = await loadSongstoArray();
+    let finalSongs = [];
+    for(let i=0; i<Songs.length; i++){
+        console.log(`${i} : ${Songs[i].title}`);
+        finalSongs.push(
+            {
+                id: `${i}`,
+                url: Songs[i].url,
+                title: Songs[i].title,
+                artist: Songs[i].artist,
+                duration: Songs[i].duration
+            }
+        )
+    }
+    //console.log(Object.keys(Songs));
+    await TrackPlayer.add(finalSongs);
     await TrackPlayer.setRepeatMode(RepeatMode.Queue);
 }
 
 export async function playbackService() {
-    
+
 }
