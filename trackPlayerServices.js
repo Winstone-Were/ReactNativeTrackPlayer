@@ -46,6 +46,20 @@ export async function addTracks() {
             title: 'Counter',
             artist: 'Stonie',
             duration: 60
+        },
+        {
+            id:'2',
+            url: require('./assets/Cyan.mp3'),
+            title:'Cyan',
+            artist:'Stonie',
+            duration: 60
+        },
+        {
+            id:'3',
+            url: require('./assets/Was Kalopsia.mp3'),
+            title:'Was Kalopsia',
+            artist:'Stonie',
+            duration:60
         }
     ]);
     await TrackPlayer.setRepeatMode(RepeatMode.Queue);
