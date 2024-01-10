@@ -45,7 +45,7 @@ async function loadSongstoArray() {
     if (permissions) {
         try {
             const songResults = await getAll({
-                limit: 40,
+                limit: 1000,
                 coverQuality: 50,
                 minSongDuration: 1000,
                 sortOrder: SortSongOrder.DESC,
