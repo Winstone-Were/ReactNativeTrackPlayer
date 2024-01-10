@@ -159,11 +159,38 @@ function Header() {
   async function setTrackInfo() {
     const track = await TrackPlayer.getCurrentTrack();
     const info = await TrackPlayer.getTrack(track);
+    if (info.cover == null) {
+      console.log("No Cover Info");
+    } else {
+      console.log("Cover Info")
+    }
     setInfo(info);
   }
   return (
     <View>
-      <Image src={{uri: require("./assets/audio.jpg")}}/>
+      {
+        info.cover ? 
+              <Image
+              source={{
+                uri: info.cover,
+              }}
+              resizeMode="cover"
+              style={{
+                width: 150,
+                height: 150,
+              }}
+            />
+            :
+            <Image
+            source={require('./assets/speaker-filled-audio-tool.png')}
+            resizeMode="cover"
+            style={{
+              width: 150,
+              height: 150,
+            }}
+          />
+      }
+
       <Text style={styles.songTitle}>{info.title}</Text>
       <Text style={styles.artistName}>{info.artist}</Text>
     </View>
