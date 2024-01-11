@@ -45,5 +45,5 @@ This is a simple music player app built using React Native and the `react-native
 ## Contributing
 Feel free to open issues or submit pull requests for any improvements or bug fixes.
 
-## License
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+License
+This project is licensed under the MIT License - see the LICENSE.md file for details.
