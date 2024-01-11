@@ -34,7 +34,11 @@ Previous/Next Button: Skip to the previous or next track in the playlist.
 Shuffle Button: Randomly shuffle the playlist order.
 
 Screenshots
-
+![Screenshot 1](screenshots/PlayingAudio.png)
+![Screenshot 2](screenshots/MediaInfoView.png)
+![Screenshot 3](screenshots/timeView.png)
+![Screenshot 3](screenshots/scrollViewForSongs.png)
+![Screenshot 3](screenshots/Controls.png)
 
 Libraries Used
 react-native-track-player: A customizable audio player for React Native.
