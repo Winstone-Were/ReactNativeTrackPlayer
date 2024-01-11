@@ -2,6 +2,8 @@
 
 This is a simple music player app built using React Native and the `react-native-track-player` library. It allows users to play, pause, skip tracks, shuffle the playlist, and view track progress.
 
+[Download Demo](/app-debug.apk)
+
 ## Features
 - Play, pause, skip to the previous/next track.
 - Shuffle the playlist to enjoy a randomized listening experience.
