@@ -16,6 +16,7 @@ import TrackPlayer, { Event, useTrackPlayerEvents, State, usePlaybackState, useP
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { check, PERMISSIONS, request, RESULTS, requestMultiple } from 'react-native-permissions';
 import { setupPlayer, addTracks } from './trackPlayerServices';
+import { load } from 'react-native-track-player/lib/trackPlayer';
 
 function Playlist() {
   const [queue, setQueue] = useState([]);
@@ -62,6 +63,15 @@ function Playlist() {
 
   }
 
+  async function handleShuffle() {
+    let queue = await TrackPlayer.getQueue();
+    await TrackPlayer.reset();
+    queue.sort(()=> Math.random() - 0.5);
+    await TrackPlayer.add(queue);
+    loadPlaylist();
+    TrackPlayer.play();
+  }
+
   return (
     <View>
       <View style={styles.playlist}>
@@ -74,7 +84,7 @@ function Playlist() {
           }
         />
       </View>
-      <Controls />
+      <Controls onShuffle={handleShuffle}/>
     </View>
   );
 
@@ -93,6 +103,7 @@ function Controls({ onShuffle }) {
     }
   })
 
+  let playing;
   async function handlePlayerPress() {
     if (await TrackPlayer.getState() == State.Playing) {
       TrackPlayer.pause();
@@ -100,7 +111,12 @@ function Controls({ onShuffle }) {
       TrackPlayer.play();
     }
     const info = await TrackPlayer.getTrack(await TrackPlayer.getCurrentTrack());
-    console.log(Object.keys(info));
+    console.log(playerState);
+    if(playerState.state == "playing"){
+      playing = false;
+    }else{
+      playing = true;
+    }
   }
 
   return (
@@ -111,17 +127,35 @@ function Controls({ onShuffle }) {
         backgroundColor="transparent"
         onPress={() => TrackPlayer.skipToPrevious()}
       />
-      <Icon.Button
-        name={ButtonIconString ? 'pause' : 'play'}
-        size={28}
-        backgroundColor="transparent"
-        onPress={handlePlayerPress}
-      />
+      {
+        playerState.state == "paused" ?
+        <Icon.Button
+            name="play"
+            size={28}
+          backgroundColor="transparent"
+          onPress={handlePlayerPress}
+        />
+
+        :
+        <Icon.Button
+            name="pause"
+            size={28}
+            backgroundColor="transparent"
+            onPress={handlePlayerPress}
+        />
+      }
+
       <Icon.Button
         name="arrow-right"
         size={28}
         backgroundColor="transparent"
         onPress={() => TrackPlayer.skipToNext()}
+      />
+      <Icon.Button 
+        name="random"
+        size={28}
+        backgroundColor="transparent"
+        onPress={onShuffle}
       />
     </View>
   )
@@ -196,6 +230,8 @@ function Header() {
     </View>
   );
 }
+
+
 
 function App() {
   const [playerReady, setPlayerReady] = useState(false);
