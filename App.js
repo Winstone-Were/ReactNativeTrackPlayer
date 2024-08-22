@@ -18,6 +18,10 @@ import { check, PERMISSIONS, request, RESULTS, requestMultiple } from 'react-nat
 import { setupPlayer, addTracks } from './trackPlayerServices';
 import { load } from 'react-native-track-player/lib/trackPlayer';
 
+function completelyUselessFunction(){
+  
+}
+
 function Playlist() {
   const [queue, setQueue] = useState([]);
   const [currentTrack, setCurrentTrack] = useState(0);
