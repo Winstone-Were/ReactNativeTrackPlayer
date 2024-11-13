@@ -3,6 +3,7 @@
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white)
 ![React Native](https://img.shields.io/badge/React_Native-20232A?logo=react&logoColor=61DAFB)
+
 This is a simple music player app built using React Native and the `react-native-track-player` library. It allows users to play, pause, skip tracks, shuffle the playlist, and view track progress.
 
 ### Download the Android Demo
